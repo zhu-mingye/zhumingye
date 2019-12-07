@@ -115,7 +115,7 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.9.0</version>
+			<version>2.9.10.1</version>
 		</dependency>
 		<!-- 杰克逊核心处理抽象（aka Streaming API），JSON实现 -->
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
