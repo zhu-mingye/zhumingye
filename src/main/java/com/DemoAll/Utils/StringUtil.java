@@ -580,7 +580,111 @@ public class StringUtil {
 		return result.toString();
 	}
 	// 获取n个随机中文字符串
+	  /**
+     * 判断字符串是否只包含unicode数字，包括小数。
+     *
+     * <p>
+     * <code>null</code>将返回<code>false</code>，空字符串<code>""</code>将返回<code>true</code>。
+     * </p>
+     * <pre>
+     * StringUtil.isNumeric(null)   = false
+     * StringUtil.isNumeric("")     = false
+     * StringUtil.isNumeric("  ")   = false
+     * StringUtil.isNumeric("123")  = true
+     * StringUtil.isNumeric("12 3") = false
+     * StringUtil.isNumeric("ab2c") = false
+     * StringUtil.isNumeric("12-3") = false
+     * StringUtil.isNumeric("12.3") = true
+     * </pre>
+     *
+     * @param str 要检查的字符串
+     *
+     * @return 如果字符串非<code>null</code>并且全由unicode数字组成，则返回<code>true</code>
+     */
+    public static boolean isNumbers(String str) {
+        if (isBlank(str)) {
+            return false;
+        }
+        int index = str.indexOf(".");
+        if (index < 0) {
+            return isNumeric(str);
+        } else {
+            String num1 = str.substring(0, index);
+            String num2 = str.substring(index + 1);
+            return isNumeric(num1) && isNumeric(num2);
+        }
+    }
+    
 
+	/**
+	 * 检查字符串是否是空白：<code>null</code>、空字符串<code>""</code>或只有空白字符。
+	 * 
+	 * <pre>
+	 * StringUtil.isBlank(null)      = true
+	 * StringUtil.isBlank("")        = true
+	 * StringUtil.isBlank(" ")       = true
+	 * StringUtil.isBlank("bob")     = false
+	 * StringUtil.isBlank("  bob  ") = false
+	 * </pre>
+	 *
+	 * @param str
+	 *            要检查的字符串
+	 *
+	 * @return 如果为空白, 则返回<code>true</code>
+	 */
+	public static boolean isBlank(String str) {
+		int length;
+
+		if ((str == null) || ((length = str.length()) == 0)) {
+			return true;
+		}
+
+		for (int i = 0; i < length; i++) {
+			if (!Character.isWhitespace(str.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+    
+    /**
+     * 判断字符串是否只包含unicode数字。
+     *
+     * <p>
+     * <code>null</code>将返回<code>false</code>，空字符串<code>""</code>将返回<code>true</code>。
+     * </p>
+     * <pre>
+     * StringUtil.isNumeric(null)   = false
+     * StringUtil.isNumeric("")     = true
+     * StringUtil.isNumeric("  ")   = false
+     * StringUtil.isNumeric("123")  = true
+     * StringUtil.isNumeric("12 3") = false
+     * StringUtil.isNumeric("ab2c") = false
+     * StringUtil.isNumeric("12-3") = false
+     * StringUtil.isNumeric("12.3") = false
+     * </pre>
+     *
+     * @param str 要检查的字符串
+     *
+     * @return 如果字符串非<code>null</code>并且全由unicode数字组成，则返回<code>true</code>
+     */
+    public static boolean isNumeric(String str) {
+        if (str == null) {
+            return false;
+        }
+
+        int length = str.length();
+
+        for (int i = 0; i < length; i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+	
+	
 	/**
 	 * 是否是纯数字
 	 * 

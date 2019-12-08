@@ -47,7 +47,11 @@ public class FileUploadUtils {
 			uuid = UUID.randomUUID().toString().replace("-", "");
 			if (originalFilename.endsWith("png")
 					|| originalFilename.endsWith("jpg")
-					|| originalFilename.endsWith("gif")) {
+					|| originalFilename.endsWith("gif")
+					|| originalFilename.endsWith("csv")
+					|| originalFilename.endsWith("docx")
+					|| originalFilename.endsWith("doc")
+					|| originalFilename.endsWith("xlsx")) {
 				File file = new File(realPath + "/" + uuid + originalFilename);
 				photo.transferTo(file);
 			}

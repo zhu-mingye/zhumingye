@@ -19,7 +19,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkEmail(String email) {
 		String regex = "\\w+@\\w+\\.[a-z]+(\\.[a-z]+)?";
-		return Pattern.matches(regex, email);
+		return email.matches(regex);
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkIdCard(String idCard) {
 		String regex = "[1-9]\\d{13,16}[a-zA-Z0-9]{1}";
-		return Pattern.matches(regex, idCard);
+		return idCard.matches(regex);
 	}
 	/**
 	 * 手机号验证
@@ -40,14 +40,8 @@ public class RegexUtils {
 	 * @return 验证通过返回true
 	 */
 	public static boolean isMobile(String str) {
-		Pattern p = null;
-		Matcher m = null;
-		boolean b = false;
-		p = Pattern.compile("^[1][3,4,5,7,8][0-9]{9}$"); // 验证手机号
-															// 1[3,4,5,6,7,8]9876545435
-		m = p.matcher(str);
-		b = m.matches();
-		return b;
+		String reg="^[1][3,6,5,7,8,9][0-9]{9}$";
+		return str.matches(reg);
 	}
 
 	/**
@@ -90,7 +84,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkMobile(String mobile) {
 		String regex = "^1[356789]\\d{9}$";
-		return Pattern.matches(regex, mobile);
+		return mobile.matches(regex);
 	}
 
 	/**
@@ -113,7 +107,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkPhone(String phone) {
 		String regex = "(\\+\\d+)?(\\d{3,4}\\-?)?\\d{7,8}$";
-		return Pattern.matches(regex, phone);
+		return phone.matches(regex);
 	}
 
 	/**
@@ -125,7 +119,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkDigit(String digit) {
 		String regex = "\\-?[1-9]\\d+";
-		return Pattern.matches(regex, digit);
+		return digit.matches(regex);
 	}
 
 	/**
@@ -137,7 +131,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkDecimals(String decimals) {
 		String regex = "\\-?[1-9]\\d+(\\.\\d+)?";
-		return Pattern.matches(regex, decimals);
+		return decimals.matches(regex);
 	}
 
 	/**
@@ -149,7 +143,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkBlankSpace(String blankSpace) {
 		String regex = "\\s+";
-		return Pattern.matches(regex, blankSpace);
+		return blankSpace.matches(regex);
 	}
 
 	/**
@@ -161,7 +155,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkChinese(String chinese) {
 		String regex = "^[\u4E00-\u9FA5]+$";
-		return Pattern.matches(regex, chinese);
+		return chinese.matches(regex);
 	}
 
 	/**
@@ -173,7 +167,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkBirthday(String birthday) {
 		String regex = "[1-9]{4}([-./])\\d{1,2}\\1\\d{1,2}";
-		return Pattern.matches(regex, birthday);
+		return birthday.matches(regex);
 	}
 
 	/**
@@ -186,7 +180,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkURL(String url) {
 		String regex = "(https?://(w{3}\\.)?)?\\w+\\.\\w+(\\.[a-zA-Z]+)*(:\\d{1,5})?(/\\w*)*(\\??(.+=.*)?(&.+=.*)?)?";
-		return Pattern.matches(regex, url);
+		return url.matches(regex);
 	}
 
 	/**
@@ -218,7 +212,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkPostcode(String postcode) {
 		String regex = "[1-9]\\d{5}";
-		return Pattern.matches(regex, postcode);
+		return postcode.matches(regex);
 	}
 
 	/**
@@ -230,7 +224,7 @@ public class RegexUtils {
 	 */
 	public static boolean checkIpAddress(String ipAddress) {
 		String regex = "[1-9](\\d{1,2})?\\.(0|([1-9](\\d{1,2})?))\\.(0|([1-9](\\d{1,2})?))\\.(0|([1-9](\\d{1,2})?))";
-		return Pattern.matches(regex, ipAddress);
+		return ipAddress.matches(regex);
 	}
 
 }

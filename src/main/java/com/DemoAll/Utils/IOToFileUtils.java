@@ -316,7 +316,13 @@ public class IOToFileUtils {
             e.printStackTrace();
         }
     }
-    
+    /**
+     * 以行为单位读取文件，返回list集合
+     * <br>Description:TODO 方法功能描述  
+     * <br>Date:2019年12月7日
+     * @param fileName  文件路径
+     * @return
+     */
     public static List<String> readFileByLinesList(String fileName){
         File file = new File(fileName);
         BufferedReader reader = null;
