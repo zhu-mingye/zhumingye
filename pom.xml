@@ -1,17 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.zhumingye.DemoAllUtils.Utils</groupId>
-  <artifactId>DemoAllUtils</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
-  
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.zhumingye.DemoAllUtils.Utils</groupId>
+	<artifactId>DemoAllUtils</artifactId>
+	<version>0.0.3-SNAPSHOT</version>
+
 
 	<properties>
+		<argLine>-Dfile.encoding=UTF-8</argLine>
 		<!-- 设置项目字符集 -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- spring版本号 -->
 		<spring.version>4.3.2.RELEASE</spring.version>
-	</properties> 
+	</properties>
 	<dependencies>
 		<!-- 配置servlet Java Servlet API -->
 		<dependency>
@@ -232,13 +233,44 @@
 
 	</dependencies>
 
-
-
-
 	<build>
 		<plugins>
-	
-	<!-- 解决eclipse中缺少插件导致无法编译异常 -->
+
+		<!-- 	生成doc jar包
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin> -->
+
+
+
+			<!--生成源码jar包 -->
+<!-- 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> -->
+			<!-- 解决eclipse中缺少插件导致无法编译异常 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -246,7 +278,7 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-		<!-- 配置tomcat插件，web端 -->
+			<!-- 配置tomcat插件，web端 -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -268,9 +300,9 @@
 					<scanIntervalSeconds>1</scanIntervalSeconds>
 				</configuration>
 			</plugin>
-		
+
 		</plugins>
 	</build>
 
-  
+
 </project>

@@ -7,6 +7,11 @@ package com.DemoAll.Utils;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import com.DemoAll.Utils.StringUtil;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -67,6 +72,31 @@ public class DateUtils {
 	 * Date Style for detail
 	 */
 	public static final String DATESTYLE_DETAIL = "yyyyMMddHHmmssSSS";
+
+	// 默认日期格式
+	public static final String DATE_DEFAULT_FORMAT = "yyyy-MM-dd";
+
+	// 默认时间格式
+	public static final String DATETIME_DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	public static final String TIME_DEFAULT_FORMAT = "HH:mm:ss";
+
+	// 日期格式化
+	private static DateFormat dateFormat = null;
+
+	// 时间格式化
+	private static DateFormat dateTimeFormat = null;
+
+	private static DateFormat timeFormat = null;
+
+	private static Calendar gregorianCalendar = null;
+
+	static {
+		dateFormat = new SimpleDateFormat(DATE_DEFAULT_FORMAT);
+		dateTimeFormat = new SimpleDateFormat(DATETIME_DEFAULT_FORMAT);
+		timeFormat = new SimpleDateFormat(TIME_DEFAULT_FORMAT);
+		gregorianCalendar = new GregorianCalendar();
+	}
 
 	// static long now = System.currentTimeMillis();
 	// public static Date CurrTime = new Date(now);
@@ -320,20 +350,6 @@ public class DateUtils {
 	}
 
 	/**
-	 * 主函数
-	 * 
-	 * @param args
-	 *            测试参数
-	 */
-	public static void main(String[] args) {
-		DateUtils d = new DateUtils();
-		String strDate = "2007-02-11";
-		Date aa = d.stringToDateShort(strDate);
-
-		DateUtils ddd = new DateUtils();
-
-	}
-	/**
 	 * 字符串转换为日期
 	 * 
 	 * @param dateString
@@ -380,8 +396,7 @@ public class DateUtils {
 		Date dt = stringToDate(dateString, sf);
 		return dt;
 	}
-	public DateUtils() {
-	}
+
 	/**
 	 * 取得日以上粒度起始时间
 	 * 
@@ -391,97 +406,30 @@ public class DateUtils {
 	 *            结束时间
 	 * @return 起始时间
 	 */
-	public String getBeginDate(String granularity, String statisticDate) {
+	public static String getBeginDate(String granularity,
+			String statisticDate) {
 		String beginDate = "";
-		Date date = this.stringToDateShort(statisticDate);
+		Date date = DateUtils.stringToDateShort(statisticDate);
 		Date beginDateTemp = null;
 		if (granularity.equals("1")) {// 日
 			beginDateTemp = date;
 		}
 		if (granularity.equals("2")) {// 周
-			beginDateTemp = this.getWeekBegin(date);
+			beginDateTemp = DateUtils.getWeekBegin(date);
 		}
 		if (granularity.equals("3")) {// 旬
-			beginDateTemp = this.getPeriodBegin(date);
+			beginDateTemp = DateUtils.getPeriodBegin(date);
 		} else if (granularity.equals("4")) {// 月
-			beginDateTemp = this.getMonthBegin(date);
+			beginDateTemp = DateUtils.getMonthBegin(date);
 		} else if (granularity.equals("5")) {// 季
-			beginDateTemp = this.getSeasonBegin(date);
+			beginDateTemp = DateUtils.getSeasonBegin(date);
 		} else if (granularity.equals("6")) {// 半年
-			beginDateTemp = this.getHalfYearBegin(date);
+			beginDateTemp = DateUtils.getHalfYearBegin(date);
 		} else if (granularity.equals("7")) {// 年
-			beginDateTemp = this.getYearBegin(date);
+			beginDateTemp = DateUtils.getYearBegin(date);
 		}
-		beginDate = this.dateToStringShort(beginDateTemp);
+		beginDate = DateUtils.dateToStringShort(beginDateTemp);
 		return beginDate;
-	}
-
-	/**
-	 *
-	 * @param currentTime
-	 *            计算日期
-	 * @param type
-	 *            偏移的类别
-	 * @param iQuantity
-	 *            偏移数量
-	 * @return 偏移后的时间串
-	 */
-	public String getDateChangeALL(String currentTime, String type,
-			int iQuantity) {
-		Date curr = null;
-		String newtype = "";
-		if (currentTime.length() == 10) {
-			curr = this.stringToDateShort(currentTime);
-		}
-		if (currentTime.length() > 10) {
-			curr = this.stringToDate(currentTime);
-		}
-
-		// 日
-		if (type.equals("1")) {
-			iQuantity = iQuantity;
-			newtype = "d";
-		}
-		// 周，按照7天计算
-		else if (type.equals("2")) {
-			iQuantity = iQuantity * 7;
-			newtype = "d";
-		}
-		// 旬，按照10天计算
-		else if (type.equals("3")) {
-			iQuantity = iQuantity * 10;
-			newtype = "d";
-		}
-		// 月
-		else if (type.equals("4")) {
-			iQuantity = iQuantity;
-			newtype = "m";
-		}
-		// 旬，按照3个月计算
-		else if (type.equals("5")) {
-			iQuantity = iQuantity * 3;
-			newtype = "m";
-		}
-		// 半年，按照六个月计算
-		else if (type.equals("6")) {
-			iQuantity = iQuantity * 6;
-			newtype = "m";
-		}
-		// 年
-		else if (type.equals("7")) {
-			newtype = "y";
-		} else {
-			iQuantity = iQuantity;
-			newtype = "d";
-		}
-
-		Date change = this.getDateChangeTime(curr, newtype, iQuantity);
-
-		// if(!type.equals("d")){
-		// change = this.getMonthEnd(change);
-		// }
-
-		return this.dateToStringShort(change);
 	}
 
 	/**
@@ -494,16 +442,16 @@ public class DateUtils {
 	 *            偏移数量
 	 * @return 偏移后的时间
 	 */
-	public Date getDateChangeTime(Date currentTime, String type,
+	public static Date getDateChangeTime(Date currentTime, String type,
 			int iQuantity) {
-		int year = Integer.parseInt(this.FormatDate(currentTime, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(currentTime, "MM"));
+		int year = Integer.parseInt(DateUtils.FormatDate(currentTime, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(currentTime, "MM"));
 		// 月份修正
 		month = month - 1;
-		int day = Integer.parseInt(this.FormatDate(currentTime, "dd"));
-		int hour = Integer.parseInt(this.FormatDate(currentTime, "HH"));
-		int mi = Integer.parseInt(this.FormatDate(currentTime, "mm"));
-		int ss = Integer.parseInt(this.FormatDate(currentTime, "ss"));
+		int day = Integer.parseInt(DateUtils.FormatDate(currentTime, "dd"));
+		int hour = Integer.parseInt(DateUtils.FormatDate(currentTime, "HH"));
+		int mi = Integer.parseInt(DateUtils.FormatDate(currentTime, "mm"));
+		int ss = Integer.parseInt(DateUtils.FormatDate(currentTime, "ss"));
 		GregorianCalendar gc = new GregorianCalendar(year, month, day, hour, mi,
 				ss);
 		// 月份修正
@@ -534,11 +482,11 @@ public class DateUtils {
 	 *            偏移数量
 	 * @return 偏移后的时间串
 	 */
-	public String getDateChangeTime(String currentTime, String type,
+	public static String getDateChangeTime(String currentTime, String type,
 			int iQuantity) {
-		Date curr = this.stringToDate(currentTime);
-		curr = this.getDateChangeTime(curr, type, iQuantity);
-		return this.dateToString(curr);
+		Date curr = DateUtils.stringToDate(currentTime);
+		curr = DateUtils.getDateChangeTime(curr, type, iQuantity);
+		return DateUtils.dateToString(curr);
 	}
 	/**
 	 * 取得日以上粒度起始时间
@@ -549,30 +497,30 @@ public class DateUtils {
 	 *            结束时间
 	 * @return 起始时间
 	 */
-	public String getEndDate(String granularity, String statisticDate) {
+	public static String getEndDate(String granularity, String statisticDate) {
 		String beginDate = "";
-		Date date = this.stringToDateShort(statisticDate);
+		Date date = DateUtils.stringToDateShort(statisticDate);
 		Date beginDateTemp = null;
 
 		if (granularity.equals("1")) {// 日
 			beginDateTemp = date;
 		}
 		if (granularity.equals("2")) {// 周
-			beginDateTemp = this.getWeekEnd(date);
+			beginDateTemp = DateUtils.getWeekEnd(date);
 		}
 		if (granularity.equals("3")) {// 旬
-			beginDateTemp = this.getPeriodEnd(date);
+			beginDateTemp = DateUtils.getPeriodEnd(date);
 		} else if (granularity.equals("4")) {// 月
-			beginDateTemp = this.getMonthEnd(date);
+			beginDateTemp = DateUtils.getMonthEnd(date);
 		} else if (granularity.equals("5")) {// 季
-			beginDateTemp = this.getSeasonEnd(date);
+			beginDateTemp = DateUtils.getSeasonEnd(date);
 		} else if (granularity.equals("6")) {// 半年
-			beginDateTemp = this.getHalfYearEnd(date);
+			beginDateTemp = DateUtils.getHalfYearEnd(date);
 		} else if (granularity.equals("7")) {// 年
-			beginDateTemp = this.getYearEnd(date);
+			beginDateTemp = DateUtils.getYearEnd(date);
 		}
 
-		beginDate = this.dateToStringShort(beginDateTemp);
+		beginDate = DateUtils.dateToStringShort(beginDateTemp);
 		return beginDate;
 	}
 
@@ -582,16 +530,16 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getHalfYearBegin(Date date) {
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
-		String newDateStr = this.FormatDate(date, "yyyy") + "-";
+	public static Date getHalfYearBegin(Date date) {
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-";
 		if (month <= 6) {
 			newDateStr += "01-01";
 		} else {
 			newDateStr += "07-01";
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -600,16 +548,318 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getHalfYearEnd(Date date) {
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
-		String newDateStr = this.FormatDate(date, "yyyy") + "-";
+	public static Date getHalfYearEnd(Date date) {
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-";
 		if (month <= 6) {
 			newDateStr += "06-30";
 		} else {
 			newDateStr += "12-31";
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
+	}
+
+	/**
+	 * 获取当前月的第一天
+	 * 
+	 * @return date
+	 */
+	public static Date getFirstDayOfMonth() {
+		gregorianCalendar.setTime(new Date());
+		gregorianCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取当前月的最后一天
+	 * 
+	 * @return
+	 */
+	public static Date getLastDayOfMonth() {
+		gregorianCalendar.setTime(new Date());
+		gregorianCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		gregorianCalendar.add(Calendar.MONTH, 1);
+		gregorianCalendar.add(Calendar.DAY_OF_MONTH, -1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取指定月的第一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getFirstDayOfMonth(Date date) {
+		gregorianCalendar.setTime(date);
+		gregorianCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取指定月的最后一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getLastDayOfMonth(Date date) {
+		gregorianCalendar.setTime(date);
+		gregorianCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		gregorianCalendar.add(Calendar.MONTH, 1);
+		gregorianCalendar.add(Calendar.DAY_OF_MONTH, -1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取日期前一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getDayBefore(Date date) {
+		gregorianCalendar.setTime(date);
+		int day = gregorianCalendar.get(Calendar.DATE);
+		gregorianCalendar.set(Calendar.DATE, day - 1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取日期后一天
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getDayAfter(Date date) {
+		gregorianCalendar.setTime(date);
+		int day = gregorianCalendar.get(Calendar.DATE);
+		gregorianCalendar.set(Calendar.DATE, day + 1);
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取当前年
+	 * 
+	 * @return
+	 */
+	public static int getNowYear() {
+		Calendar d = Calendar.getInstance();
+		return d.get(Calendar.YEAR);
+	}
+
+	/**
+	 * 获取当前月份
+	 * 
+	 * @return
+	 */
+	public static int getNowMonth() {
+		Calendar d = Calendar.getInstance();
+		return d.get(Calendar.MONTH) + 1;
+	}
+
+	/**
+	 * 获取当月天数
+	 * 
+	 * @return
+	 */
+	public static int getNowMonthDay() {
+		Calendar d = Calendar.getInstance();
+		return d.getActualMaximum(Calendar.DATE);
+	}
+
+	/**
+	 * 获取时间段的每一天
+	 * 
+	 * @param 开始日期
+	 * @param 结算日期
+	 * @return 日期列表
+	 */
+	public static List<Date> getEveryDay(Date startDate, Date endDate) {
+		if (startDate == null || endDate == null) {
+			return null;
+		}
+		// 格式化日期(yy-MM-dd)
+		startDate = DateUtils.getDateFormat(DateUtils.getDateFormat(startDate));
+		endDate = DateUtils.getDateFormat(DateUtils.getDateFormat(endDate));
+		List<Date> dates = new ArrayList<Date>();
+		gregorianCalendar.setTime(startDate);
+		dates.add(gregorianCalendar.getTime());
+		while (gregorianCalendar.getTime().compareTo(endDate) < 0) {
+			// 加1天
+			gregorianCalendar.add(Calendar.DAY_OF_MONTH, 1);
+			dates.add(gregorianCalendar.getTime());
+		}
+		return dates;
+	}
+
+	/**
+	 * 日期格式化yyyy-MM-dd
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date formatDate(String date, String format) {
+		try {
+			return new SimpleDateFormat(format).parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 日期格式化yyyy-MM-dd
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static String getDateFormat(Date date) {
+		return dateFormat.format(date);
+	}
+
+	/**
+	 * 日期格式化yyyy-MM-dd HH:mm:ss
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static String getDateTimeFormat(Date date) {
+		return dateTimeFormat.format(date);
+	}
+
+	/**
+	 * 时间格式化
+	 * 
+	 * @param date
+	 * @return HH:mm:ss
+	 */
+	public static String getTimeFormat(Date date) {
+		return timeFormat.format(date);
+	}
+
+	/**
+	 * 日期格式化
+	 * 
+	 * @param date
+	 * @param 格式类型
+	 * @return
+	 */
+	public static String getDateFormat(Date date, String formatStr) {
+		if (StringUtil.isNotEmpty(formatStr)) {
+			return new SimpleDateFormat(formatStr).format(date);
+		}
+		return null;
+	}
+
+	/**
+	 * 日期格式化
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getDateFormat(String date) {
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 时间格式化
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getDateTimeFormat(String date) {
+		try {
+			return dateTimeFormat.parse(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 获取当前日期(yyyy-MM-dd)
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static Date getNowDate() {
+		return DateUtils.getDateFormat(dateFormat.format(new Date()));
+	}
+
+	/**
+	 * 获取当前日期星期一日期
+	 * 
+	 * @return date
+	 */
+	public static Date getFirstDayOfWeek() {
+		gregorianCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+		gregorianCalendar.setTime(new Date());
+		gregorianCalendar.set(Calendar.DAY_OF_WEEK,
+				gregorianCalendar.getFirstDayOfWeek()); // Monday
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取当前日期星期日日期
+	 * 
+	 * @return date
+	 */
+	public static Date getLastDayOfWeek() {
+		gregorianCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+		gregorianCalendar.setTime(new Date());
+		gregorianCalendar.set(Calendar.DAY_OF_WEEK,
+				gregorianCalendar.getFirstDayOfWeek() + 6); // Monday
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取日期星期一日期
+	 * 
+	 * @param 指定日期
+	 * @return date
+	 */
+	public static Date getFirstDayOfWeek(Date date) {
+		if (date == null) {
+			return null;
+		}
+		gregorianCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+		gregorianCalendar.setTime(date);
+		gregorianCalendar.set(Calendar.DAY_OF_WEEK,
+				gregorianCalendar.getFirstDayOfWeek()); // Monday
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取日期星期一日期
+	 * 
+	 * @param 指定日期
+	 * @return date
+	 */
+	public static Date getLastDayOfWeek(Date date) {
+		if (date == null) {
+			return null;
+		}
+		gregorianCalendar.setFirstDayOfWeek(Calendar.MONDAY);
+		gregorianCalendar.setTime(date);
+		gregorianCalendar.set(Calendar.DAY_OF_WEEK,
+				gregorianCalendar.getFirstDayOfWeek() + 6); // Monday
+		return gregorianCalendar.getTime();
+	}
+
+	/**
+	 * 获取提前多少个月
+	 * 
+	 * @param monty
+	 * @return
+	 */
+	public static Date getFirstMonth(int monty) {
+		Calendar c = Calendar.getInstance();
+		c.add(Calendar.MONTH, -monty);
+		return c.getTime();
 	}
 
 	/**
@@ -618,10 +868,10 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getMonthBegin(Date date) {
-		String newDateStr = this.FormatDate(date, "yyyy-MM") + "-01";
+	public static Date getMonthBegin(Date date) {
+		String newDateStr = DateUtils.FormatDate(date, "yyyy-MM") + "-01";
 		// FormatDate(date, "yyyy-MM-dd");
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -631,21 +881,21 @@ public class DateUtils {
 	 *            日期
 	 * @return date
 	 */
-	public Date getMonthEnd(Date date) {
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
-		int day = Integer.parseInt(this.FormatDate(date, "dd"));
+	public static Date getMonthEnd(Date date) {
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
+		int day = Integer.parseInt(DateUtils.FormatDate(date, "dd"));
 
 		GregorianCalendar calendar = new GregorianCalendar(year, month - 1, day,
 				0, 0, 0);
 		int monthLength = calendar.getActualMaximum(calendar.DAY_OF_MONTH);
-		String newDateStr = this.FormatDate(date, "yyyy") + "-"
-				+ this.FormatDate(date, "MM") + "-";
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-"
+				+ DateUtils.FormatDate(date, "MM") + "-";
 		if (monthLength < 10)
 			newDateStr += "0" + monthLength;
 		else
 			newDateStr += "" + monthLength;
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -654,9 +904,9 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getPeriodBegin(Date date) {
-		int days = Integer.parseInt(this.FormatDate(date, "dd"));
-		String newDateStr = this.FormatDate(date, "yyyy-MM") + "-";
+	public static Date getPeriodBegin(Date date) {
+		int days = Integer.parseInt(DateUtils.FormatDate(date, "dd"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy-MM") + "-";
 		if (days <= 10) {
 			newDateStr += "01";
 		} else if (days <= 20) {
@@ -664,7 +914,7 @@ public class DateUtils {
 		} else {
 			newDateStr += "21";
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -673,17 +923,18 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getPeriodEnd(Date date) {
-		int days = Integer.parseInt(this.FormatDate(date, "dd"));
-		String newDateStr = this.FormatDate(date, "yyyy-MM") + "-";
+	public static Date getPeriodEnd(Date date) {
+		int days = Integer.parseInt(DateUtils.FormatDate(date, "dd"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy-MM") + "-";
 		if (days <= 10) {
 			newDateStr += "10";
 		} else if (days <= 20) {
 			newDateStr += "20";
 		} else {
-			newDateStr = this.FormatDate(this.getMonthEnd(date), "yyyy-MM-dd");
+			newDateStr = DateUtils.FormatDate(DateUtils.getMonthEnd(date),
+					"yyyy-MM-dd");
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -692,10 +943,10 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getSeasonBegin(Date date) {
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
-		String newDateStr = this.FormatDate(date, "yyyy") + "-";
+	public static Date getSeasonBegin(Date date) {
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-";
 		if (month >= 1 && month <= 3) {
 			newDateStr += "01-01";
 		} else if (month >= 4 && month <= 6) {
@@ -705,7 +956,7 @@ public class DateUtils {
 		} else if (month >= 10 && month <= 12) {
 			newDateStr += "10-01";
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -715,10 +966,10 @@ public class DateUtils {
 	 *            日期
 	 * @return date
 	 */
-	public Date getSeasonEnd(Date date) {
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
-		String newDateStr = this.FormatDate(date, "yyyy") + "-";
+	public static Date getSeasonEnd(Date date) {
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-";
 		if (month >= 1 && month <= 3) {
 			newDateStr += "03-31";
 		} else if (month >= 4 && month <= 6) {
@@ -728,7 +979,7 @@ public class DateUtils {
 		} else if (month >= 10 && month <= 12) {
 			newDateStr += "12-31";
 		}
-		return this.stringToDateShort(newDateStr);
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -740,9 +991,9 @@ public class DateUtils {
 	 *            时间
 	 * @return 时间对应粒度的描述
 	 */
-	public String getTimedes(String granularity, String statisticDate) {
+	public static String getTimedes(String granularity, String statisticDate) {
 		String timedes = "";
-		Date date = this.stringToDateShort(statisticDate);
+		Date date = DateUtils.stringToDateShort(statisticDate);
 		String year = "", month = "01", day = "01";
 		year = DateUtils.getYear(date);
 		month = DateUtils.getMonth(date);
@@ -775,13 +1026,13 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getWeekBegin(Date date) {
+	public static Date getWeekBegin(Date date) {
 
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
 		// 月份修正
 		month = month - 1;
-		int day = Integer.parseInt(this.FormatDate(date, "dd"));
+		int day = Integer.parseInt(DateUtils.FormatDate(date, "dd"));
 
 		GregorianCalendar gc = new GregorianCalendar(year, month, day);
 
@@ -802,13 +1053,13 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getWeekEnd(Date date) {
+	public static Date getWeekEnd(Date date) {
 
-		int year = Integer.parseInt(this.FormatDate(date, "yyyy"));
-		int month = Integer.parseInt(this.FormatDate(date, "MM"));
+		int year = Integer.parseInt(DateUtils.FormatDate(date, "yyyy"));
+		int month = Integer.parseInt(DateUtils.FormatDate(date, "MM"));
 		// 月份修正
 		month = month - 1;
-		int day = Integer.parseInt(this.FormatDate(date, "dd"));
+		int day = Integer.parseInt(DateUtils.FormatDate(date, "dd"));
 
 		GregorianCalendar gc = new GregorianCalendar(year, month, day);
 
@@ -828,9 +1079,9 @@ public class DateUtils {
 	 * @param date
 	 * @return
 	 */
-	public Date getYearBegin(Date date) {
-		String newDateStr = this.FormatDate(date, "yyyy") + "-01-01";
-		return this.stringToDateShort(newDateStr);
+	public static Date getYearBegin(Date date) {
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-01-01";
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -840,9 +1091,9 @@ public class DateUtils {
 	 *            时间
 	 * @return
 	 */
-	public Date getYearEnd(Date date) {
-		String newDateStr = this.FormatDate(date, "yyyy") + "-12-31";
-		return this.stringToDateShort(newDateStr);
+	public static Date getYearEnd(Date date) {
+		String newDateStr = DateUtils.FormatDate(date, "yyyy") + "-12-31";
+		return DateUtils.stringToDateShort(newDateStr);
 	}
 
 	/**
@@ -852,12 +1103,12 @@ public class DateUtils {
 	 *            时间
 	 * @return 是或否
 	 */
-	public boolean IsXperiodEnd(Date date) {
+	public static boolean IsXperiodEnd(Date date) {
 
 		boolean flag = false;
 
-		String day = this.getDay(date);
-		String month = this.getMonth(date);
+		String day = DateUtils.getDay(date);
+		String month = DateUtils.getMonth(date);
 
 		if (day.equalsIgnoreCase("10")) {
 			flag = true;
@@ -865,7 +1116,7 @@ public class DateUtils {
 			flag = true;
 		}
 		// 月末不算旬末
-		// else if( this.getMonthEnd(date).compareTo(date)==0 ){
+		// else if( DateUtils.getMonthEnd(date).compareTo(date)==0 ){
 		// flag = true;
 		// }
 
